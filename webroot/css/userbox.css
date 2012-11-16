@@ -1,0 +1,8 @@
+form.userbox label { display: inline-block; width: 150px; }
+
+form.userbox div.submit { margin: 0.3em 0; }
+
+form.userbox input[type="submit"] { padding: 0.3em 1.0em; }
+form.userbox div.input { margin: 0.3em 0; }
+
+form.userbox .error-message { color: red; display: inline-block; margin: 0 1em; }
