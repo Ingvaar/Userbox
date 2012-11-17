@@ -2,8 +2,8 @@
 
 Download and Install:
 
-1. Download plugin Userbox and copy it to app/Plugin.
-2. Donwload plugin Acl (http://www.alaxos.net/blaxos/pages/view/34) and copy to app/Plugin.
+1. Download plugin Userbox and copy it to app/Plugin. Must be in app/Plugin/Userbox.
+2. Donwload plugin Acl (http://www.alaxos.net/blaxos/pages/view/34) and copy to app/Plugin. Must be in app/Plugin/Acl.
 3. In the file app/Config/bootstrap.php add the following line
 	
 	CakePlugin::load('Userbox', array('bootstrap' => true, 'routes' => true));
@@ -38,3 +38,5 @@ Download and Install:
 	ln -s ../Plugin/Userbox/webroot/ webroot/userbox
 	
 	See http://book.cakephp.org/1.3/view/1614/Increasing-performance-of-plugin-and-theme-assets
+	
+8. Then type in your browser http://your_site_base/admin/acl to update aco list
