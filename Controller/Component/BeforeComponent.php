@@ -48,6 +48,7 @@ class BeforeComponent extends Component
 	
 	public function __construct(ComponentCollection $collection, $settings = array())
 	{
+		$this->__defaultSettings();
 		if(isset($settings['loginAction']))
 			$this->__settings['loginAction'] = $settings['loginAction'];
 	}
