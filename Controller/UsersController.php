@@ -9,8 +9,9 @@ class UsersController extends AppController
 	 * @property AuthComponent $Auth
 	 */
 	var $belongsTo = array('Group'=>array('className'=>'Userbox.Group'));
-	var $components = array('Userbox.Recaptcha', 'Session');
+	var $components = array('Userbox.Recaptcha', 'Session', 'RequestHandler');
 	var $uses = array('Userbox.User', 'Userbox.Group');
+	var $scaffold = 'admin';
 	
 	public function __construct($request = null, $response = null)
 	{
@@ -62,12 +63,6 @@ class UsersController extends AppController
 		$this->Session->setFlash('Теперь вы неавторизованы. Хорошего дня.');
 		$this->Auth->logout();
 		$this->redirect('/');
-	}
-	
-	function admin_index()
-	{
-		$users = $this->paginate();
-		$this->set('users', $users);
 	}
 	
 	function admin_add()
@@ -138,7 +133,7 @@ class UsersController extends AppController
 	 */
 	function add()
 	{
-		$this->set('title_for_layout', 'регистрация нового пользователя');
+		$this->set('title_for_layout', 'регистрация пользователя');
 		try
 		{
 			if(empty($this->data))
@@ -151,7 +146,7 @@ class UsersController extends AppController
 				if(method_exists($this, 'event'))
 				{
 					$newUser['url'] = Router::url(array('controller'=>'users', 'action'=>'activate', 'plugin'=>'userbox', $newUser['activationCode']), true);
-					parent::event("USERBOX_USER_NEW", $newUser);
+					parent::event("USERBOX_USER_REGISTERED", $newUser);
 				}
 				$this->set('success', true);
 				$this->set('email', $newUser['email']);
@@ -231,7 +226,7 @@ class UsersController extends AppController
 
 	function ajax_login()
 	{
-		$this->layout = 'ajax';
+		$this->viewClass = 'Json';
 		try
 		{
 			if ($this->request->is('ajax'))
@@ -248,17 +243,11 @@ class UsersController extends AppController
 						// также в ответе будет указана почта пользователя
 						'user'    => array('email' => CakeSession::read('Auth.User.email'))
 					));
-					return;
 				}
-
-				if (isset($this->data['User']['email']) && isset($this->data['User']['password']))
+				else if (isset($this->data['User']['email']) && isset($this->data['User']['password']))
 				{
-					//$email    = $this->data['User']['email'];
-					//$password = $this->data['User']['password'];
-					// тут вставить код из app_controller.php
-					//$_user = array('email' => $email, 'password' => $password);
-					
-					$res = $this->Auth->login();//$_user);
+					// попытка авторизации
+					$res = $this->Auth->login();
 					if($res)
 					{
 						$result = array(
@@ -271,9 +260,10 @@ class UsersController extends AppController
 						if($redir != '/')
 						{
 							$result['redirect'] = Router::url($redir, true);
-							//$result['redirect'] = $redir;
 						}
-
+						else
+							$result['redirect'] = Router::url($this->Auth->loginRedirect, true);
+						
 						$this->set('result', $result);
 					}
 					else
@@ -281,12 +271,14 @@ class UsersController extends AppController
 				}
 				else
 					throw new Exception('Отсутствуют данные для авторизации');
+				$this->set('_serialize', array('result'));
 			}
 		}
 		catch(Exception $e)
 		{
 			// что-то не так
 			$this->set('error', $e->getMessage());
+			$this->set('_serialize', array('error'));
 		}
 	}
 	
@@ -309,7 +301,7 @@ class UsersController extends AppController
 		$this->set('title_for_layout', 'сброс пароля');
 		try
 		{
-			$captchaOn = Configure::read('Settings.captcha');
+			$captchaOn = Configure::read('Userbox.settings.captcha');
 			if(!empty($this->data))
 			{
 				if($captchaOn)
@@ -327,7 +319,7 @@ class UsersController extends AppController
 					$onlyValidate = true;
 				}
 				// ищем адрес в системе
-				$usr = $this->User->ForgotEmail($this->data['ForgotPassword']['email'], $onlyValidate);
+				$usr = $this->User->ForgotEmail($this->data['User']['email'], $onlyValidate);
 				if($captchaOn && $captcha == false)
 				{
 					throw new Exception('Recaptcha failed');
@@ -339,13 +331,13 @@ class UsersController extends AppController
 				{
 					$url = Router::url(array('controller'=>'users', 'action'=>'reset_password', 'plugin'=>'userbox', $usr['activationCode']), true);
 					parent::event("USERBOX_USER_RESET_PASSWORD", array(
-						'email'		=> $this->data['ForgotPassword']['email'],
+						'email'		=> $this->data['User']['email'],
 						'nickname'	=> $usr['nickname'],
 						'url'		=> $url
 					));
 				}
 				$this->set('success', true);
-				$this->set('email', $this->data['ForgotPassword']['email']);
+				$this->set('email', $this->data['User']['email']);
 			}
 		}
 		catch(Exception $e)
@@ -383,21 +375,6 @@ class UsersController extends AppController
 				$this->set('error', $e->getMessage());
 		}
 		$this->request->data = array();
-	}
-	
-	public function admin_view($id = null)
-	{
-		try
-		{
-			if($id == null)
-				throw new Exception('Отсутствует идентификатор пользователя');
-			$user = $this->User->read(null, $id);
-			$this->set('user', $user);
-		}
-		catch(Exception $e)
-		{
-			
-		}
 	}
 }
 ?>

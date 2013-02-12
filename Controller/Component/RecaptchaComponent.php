@@ -6,7 +6,7 @@ class RecaptchaComponent extends Component
 	 * @property HttpSocket $http
 	 */
 	const HOST = 'http://www.google.com/recaptcha/api/verify';
-	const KEY  = '6LcnpcwSAAAAAKoSKp9zeiw5RMXi5SPMwdp2uwyZ';
+	private $__settings = array();
 	
 	function initialize($controller)
 	{
@@ -14,14 +14,32 @@ class RecaptchaComponent extends Component
 		$this->http = new HttpSocket();
     }
 	
+	public function __construct(ComponentCollection $collection, $settings = array())
+	{
+		$this->__defaultSettings();
+		if(isset($settings['host']))
+			$this->__settings['host'] = $settings['host'];
+		if(isset($settings['privateKey']))
+			$this->__settings['privateKey'] = $settings['privateKey'];
+	}
+	
+	private function __defaultSettings()
+	{
+		$this->__settings = array(
+			'privateKey' => Configure::read('Recaptcha.privateKey')
+		);
+	}	
+	
 	public function Verify($data=array())
 	{
-		$privatekey = self::KEY;
+		$privatekey = $this->__settings['privateKey'];
 		$remoteip   = $data['ip'];
 		$challenge  = $data['challenge'];
 		$response   = $data['response'];
+		
 		$res = $this->http->post(self::HOST, compact('privatekey', 'remoteip', 'challenge', 'response'));
 		$res = preg_split('/\n/', $res);
+		
 		if($res[0] != 'true')
 		{
 			return false;

@@ -9,7 +9,8 @@ class User extends AppModel
 
     public $belongsTo = array('Group'=>array('className'=>'Userbox.Group'));
     public $actsAs	  = array('Acl' => array('type' => 'requester'));
-
+	
+	var $displayField = 'nickname';
 	var $validate = array(
 		'nickname' => array(
 			'notEmpty' => array(
@@ -144,11 +145,8 @@ class User extends AppModel
 	{
 		if(isset($data))
 		{
-			/*return array('activationCode'=>'3d00eb4d012d5de3cab36e2dd73a8353ea4b16e4', 'id'=>3, 'email'=>	'iapl@mail.ru',
-				'nickname'=>'user');*/
-			
 			if(!isset($data[$this->name]['nickname']))
-				$data[$this->name]['nickname'] = Configure::read('Settings.default.User.nickname');
+				$data[$this->name]['nickname'] = Configure::read('Userbox.default.User.nickname');
 
 			$this->create($data);
 			if($this->validates() == false)
@@ -168,8 +166,12 @@ class User extends AppModel
 			$this->set('activation_key', $actCode);
 			// save
 			$this->save();
-			return array('activationCode'=>$actCode, 'id'=>$this->id, 'email'=>$data[$this->name]['email'],
-				'nickname'=>$data[$this->name]['nickname']);
+			return array(
+				'activationCode'	=> $actCode,
+				'id'				=> $this->id,
+				'email'				=> $data[$this->name]['email'],
+				'nickname'			=> $data[$this->name]['nickname']
+			);
 		}
 	}
 	
@@ -304,7 +306,7 @@ class User extends AppModel
 		$this->set('password', $data[$this->name]['password']);
 		$this->set('password_key', '');
 		// сохранить
-		$this->save(null, true, array('password', 'activation_key'));
+		$this->save(null, true, array('password', 'password_key'));
 		
 		return $res[$this->name]['id'];
 	}

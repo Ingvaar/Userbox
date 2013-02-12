@@ -21,11 +21,10 @@ class BeforeComponent extends Component
 		$this->appController->Auth->authorize      = array('Actions' => array('actionPath' => 'controllers'));
 		$this->appController->Auth->loginAction    = $this->__settings['loginAction'];
 		$this->appController->Auth->logoutRedirect = array('controller' => 'users', 'action' => 'logout', 'plugin'=>'userbox');
-		
-		$this->appController->Auth->authError		= 'Did you really think you are allowed to see that?';
-		$this->appController->Auth->allowedActions  = array('display');
-		//$this->appController->Auth->allowedActions  = array('*');
-		$this->appController->Auth->loginError		= 'Имя пользователя или пароль неверные';
+		$this->appController->Auth->loginRedirect  = '/';
+		$this->appController->Auth->authError	   = 'Did you really think you are allowed to see that?';
+		$this->appController->Auth->allowedActions = array('display');
+		$this->appController->Auth->loginError	   = 'Имя пользователя или пароль неверные';
 
 		$this->appController->Auth->authenticate = array(
 			AuthComponent::ALL => array(

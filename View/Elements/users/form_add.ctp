@@ -1,4 +1,4 @@
-<div class='users form-add'>
+<div class='userbox form-add'>
 <?php
 	/* @var $this View */
 	echo $this->Html->css(array('Userbox.userbox'));
@@ -6,21 +6,21 @@
 	echo $this->Form->create('User', array('class'=>'userbox add', 'legeng'=>'Register'));
 	
 	$inputs = array(
-		'legend' => 'Register',
-		'nickname',
-		'email' => array('type'=>'email', 'label'=>'Email (login)'),
-		'password',
-		'password_2' => array('label'=>'Repeat password', 'type'=>'password'),
+		'legend' => 'Регистрация',
+		'nickname'   => array('label' => 'Имя на сайте'),
+		'email'      => array('type'  => 'email', 'label'=>'Электронная почта (логин)'),
+		'password'   => array('label' => 'Пароль'),
+		'password_2' => array('label' => 'Повтор пароля', 'type'=>'password'),
 		'group_id'
 	);
-        
-        if (isset($hidden) && is_array($hidden))
-        {
-            foreach ($inputs as $key=>$val)
-            {
-                if (in_array($val, $hidden)) unset($inputs[$key]);
-            }
-        }
+    // скрытие полей    
+	if (isset($hidden) && is_array($hidden))
+	{
+		foreach ($inputs as $key=>$val)
+		{
+			if (in_array($val, $hidden)) unset($inputs[$key]);
+		}
+	}
         
 	// add something
 	if(isset($extra) && is_array($extra))
@@ -44,6 +44,6 @@
 		}
 	}
 	echo $this->Form->inputs($inputs);
-	echo $this->Form->end('Add');
+	echo $this->Form->end('Зарегистрироваться');
 ?>
 </div>
