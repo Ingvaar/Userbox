@@ -60,7 +60,7 @@ class UsersController extends UserboxAppController
 	
 	function logout()
 	{
-		$this->Session->setFlash('Теперь вы неавторизованы. Хорошего дня.');
+		$this->Session->setFlash('Теперь вы неfsdfавторизованы. Хорошего дня.');
 		$this->Auth->logout();
 		$this->redirect('/');
 	}
