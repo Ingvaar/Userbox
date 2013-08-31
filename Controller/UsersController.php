@@ -1,6 +1,6 @@
 <?php
 App::uses('FacadeController', 'Controller');
-class UsersController extends AppController
+class UsersController extends UserboxAppController
 {
 	/**
 	 * @property User $User
@@ -8,10 +8,10 @@ class UsersController extends AppController
 	 * @property RecaptchaComponent $Recaptcha
 	 * @property AuthComponent $Auth
 	 */
-	var $belongsTo = array('Group'=>array('className'=>'Userbox.Group'));
+	var $belongsTo	= array('Group'=>array('className'=>'Userbox.Group'));
 	var $components = array('Userbox.Recaptcha', 'Session', 'RequestHandler');
-	var $uses = array('Userbox.User', 'Userbox.Group');
-	var $scaffold = 'admin';
+	var $uses		= array('Userbox.User', 'Userbox.Group');
+	var $scaffold	= 'admin';
 	
 	public function __construct($request = null, $response = null)
 	{
@@ -133,7 +133,7 @@ class UsersController extends AppController
 	 */
 	function add()
 	{
-		$this->set('title_for_layout', 'регистрация пользователя');
+		$this->set('title_for_layout', __d('userbox', 'User Registration'));
 		try
 		{
 			if(empty($this->data))
@@ -143,11 +143,8 @@ class UsersController extends AppController
 			else
 			{
 				$newUser = $this->User->CreateUser($this->data);
-				if(method_exists($this, 'event'))
-				{
-					$newUser['url'] = Router::url(array('controller'=>'users', 'action'=>'activate', 'plugin'=>'userbox', $newUser['activationCode']), true);
-					parent::event("USERBOX_USER_REGISTERED", $newUser);
-				}
+				$newUser['url'] = Router::url(array('controller'=>'users', 'action'=>'activate', 'plugin'=>'userbox', $newUser['activationCode']), true);
+				$this->getEventManager()->dispatch(new CakeEvent('Userbox.User.Registered', $newUser));
 				$this->set('success', true);
 				$this->set('email', $newUser['email']);
 			}
