@@ -108,7 +108,7 @@ class UsersController extends UserboxAppController
 		{
 			if (isset($code))
 			{
-				// активировать аккаунт пользователя
+				// activate user account
 				$lp = $this->User->Activate($code);
 			}
 		}
